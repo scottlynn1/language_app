@@ -4,7 +4,8 @@ import cors from 'cors';
 import Redis from "ioredis";
 import { v4 as uuidv4 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
-
+import fs from 'fs';
+const word_bank = JSON.parse(fs.readFileSync('./word_bank.json', 'utf-8'));
 
 dotenv.config();
 const app = express();
@@ -18,24 +19,28 @@ const ai = new GoogleGenAI({});
 
 app.get("/new-word", async (req, res) => {
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Generate one random but highschool level English noun or verb. 
-                       Provide 4 or 5 of its Spanish translations (synonyms or equivalents).
-                       Return your answer just like this:
-                       { "english": "...", "spanish": ["...", "..."] }`,
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: '{ "english": "...", "spanish": ["...", "..."] }'
-      }
-    });
+    // was using ai previously for word generation
+    // const response = await ai.models.generateContent({
+    //   model: "gemini-2.5-flash",
+    //   contents: `Generate one random but highschool level English noun or verb. 
+    //                    Provide exactly 3 of its Spanish translations (synonyms or equivalents).
+    //                    Return your answer just like this:
+    //                    { "english": "...", "spanish": ["...", "...", "..."] }`,
+    //   generationConfig: {
+    //     responseMimeType: "application/json",
+    //     responseSchema: '{ "english": "...", "spanish": ["...", "...", "..."] }'
+    //   }
+    // });
 
-    const raw = response.text;
-    const cleaned = raw.replace(/```json\n?/, "").replace(/```$/, "").trim();
-    const data = JSON.parse(cleaned);
+    // const raw = response.text;
+    // const cleaned = raw.replace(/```json\n?/, "").replace(/```$/, "").trim();
+    // const data = JSON.parse(cleaned);
+
+    const level = req.level || 'advanced';
     const gameId = uuidv4();
+    const wordData = getRandomWord(level)
     const gameData = {
-      wordData: data,
+      wordData,
       hints: [],
       guesses: [],
       status: "in_progress"
@@ -47,7 +52,7 @@ app.get("/new-word", async (req, res) => {
       return res.status(500).json({ error: err });
     }
 
-    return res.json({ english: data.english, gameId}); // hide Spanish answers
+    return res.json({ english: wordData.english, synonyms: wordData.synonyms, gameId}); // hide Spanish answers
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch from Gemini" });
@@ -56,7 +61,7 @@ app.get("/new-word", async (req, res) => {
 
 // 2. Guess the Spanish word from hints
 app.post("/guess", async (req, res) => {
-  const { hints, gameId } = req.body;
+  const { currentHint, gameId } = req.body;
 
   if (!gameId) {
     return res.status(400).json({ error: "No active game. Start a new round first." });
@@ -76,7 +81,8 @@ app.post("/guess", async (req, res) => {
           `You are playing a Spanish word guessing game. 
           Based on the hints provided by the user, respond with **exactly one correct Spanish translation or equivalent** for the English word. 
           Some valid answers may be multiple words (like 'de sobra'). 
-          Do NOT provide explanations, punctuation, or commentary. Only respond with the answer.`,
+          Do NOT provide explanations, punctuation, or commentary. Only respond with the answer.
+          The word in this round is going to be a ${gameData.wordData.partOfSpeech}`,
         }
       ]
     },
@@ -90,7 +96,6 @@ app.post("/guess", async (req, res) => {
     },
     ...chathistory
   ]
-  console.log(chathistory)
   try {
     const chat = ai.chats.create({
       model: "gemini-2.5-flash",
@@ -103,7 +108,7 @@ app.post("/guess", async (req, res) => {
     });
 
     const response = await chat.sendMessage({
-      message: `${hints.join(" | ")}`,
+      message: currentHint,
     });
 
     let guess = response.text;
@@ -111,7 +116,7 @@ app.post("/guess", async (req, res) => {
       (w) => w.toLowerCase() === guess.toLowerCase()
     );
     if (!correct) {
-      gameData.hints.push(hints.join(" | "));
+      gameData.hints.push(currentHint);
       gameData.guesses.push(guess);
       await redis.set(`game:${gameId}`, JSON.stringify(gameData), "EX", 3600);
     }
@@ -123,24 +128,30 @@ app.post("/guess", async (req, res) => {
   }
 });
 
-function constructHistory(h, g) {
+function constructHistory(hints, guesses) {
   let history = []
-  for (let i = 0; i < h.length; i++) {
+  for (let i = 0; i < hints.length; i++) {
     history.push(
       {
         role: "user",
-        parts: [{ text: `${h[i]}` }],
+        parts: [{ text: `${hints[i]}` }],
       },
       {
         role: "model",
-        parts: [{ text: `${g[i]}` }],
+        parts: [{ text: `${guesses[i]}` }],
       },
     )
   };
   return history;
 }
 
+function getRandomWord(level = 'advanced') {
+  const words = word_bank[level];
+  const randomIndex = Math.floor(Math.random() * words.length);
+  return words[randomIndex];
+}
 
+console.log(Math.random());
 
 // Start the server
 const PORT = process.env.PORT || 3000;

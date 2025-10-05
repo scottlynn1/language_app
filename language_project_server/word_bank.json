@@ -1,0 +1,230 @@
+{
+  "beginner": [
+    {
+      "english": "apple",
+      "spanish": [
+        "manzana"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "fruta",
+        "pomácea"
+      ]
+    },
+    {
+      "english": "dog",
+      "spanish": [
+        "perro"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "can",
+        "mascota"
+      ]
+    },
+    {
+      "english": "run",
+      "spanish": [
+        "correr"
+      ],
+      "partOfSpeech": "verb",
+      "synonyms": [
+        "trotar",
+        "andar"
+      ]
+    },
+    {
+      "english": "book",
+      "spanish": [
+        "libro"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "texto",
+        "volumen"
+      ]
+    },
+    {
+      "english": "water",
+      "spanish": [
+        "agua"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "líquido",
+        "h2o"
+      ]
+    }
+  ],
+  "intermediate": [
+    {
+      "english": "dream",
+      "spanish": [
+        "sueño"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "fantasía",
+        "ilusión"
+      ]
+    },
+    {
+      "english": "travel",
+      "spanish": [
+        "viajar"
+      ],
+      "partOfSpeech": "verb",
+      "synonyms": [
+        "desplazarse",
+        "recorrer"
+      ]
+    },
+    {
+      "english": "mirror",
+      "spanish": [
+        "espejo"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "reflejo",
+        "vidrio"
+      ]
+    },
+    {
+      "english": "storm",
+      "spanish": [
+        "tormenta"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "tempestad",
+        "lluvia"
+      ]
+    },
+    {
+      "english": "hope",
+      "spanish": [
+        "esperanza"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "confianza",
+        "fe"
+      ]
+    }
+  ],
+  "advanced": [
+    {
+      "english": "freedom",
+      "spanish": [
+        "libertad"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "independencia",
+        "libre"
+      ]
+    },
+    {
+      "english": "justice",
+      "spanish": [
+        "justicia"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "equidad",
+        "legalidad"
+      ]
+    },
+    {
+      "english": "courage",
+      "spanish": [
+        "valentía"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "bravura",
+        "audacia"
+      ]
+    },
+    {
+      "english": "truth",
+      "spanish": [
+        "verdad"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "realidad",
+        "hecho"
+      ]
+    },
+    {
+      "english": "faith",
+      "spanish": [
+        "fe"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "creencia",
+        "confianza"
+      ]
+    }
+  ],
+  "expert": [
+    {
+      "english": "irony",
+      "spanish": [
+        "ironía"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "sarcasmo",
+        "paradoja"
+      ]
+    },
+    {
+      "english": "nostalgia",
+      "spanish": [
+        "nostalgia"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "melancolía",
+        "recuerdo"
+      ]
+    },
+    {
+      "english": "intuition",
+      "spanish": [
+        "intuición"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "presentimiento",
+        "corazonada"
+      ]
+    },
+    {
+      "english": "chaos",
+      "spanish": [
+        "caos"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "desorden",
+        "confusión"
+      ]
+    },
+    {
+      "english": "serenity",
+      "spanish": [
+        "serenidad"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "tranquilidad",
+        "calma"
+      ]
+    }
+  ]
+}
