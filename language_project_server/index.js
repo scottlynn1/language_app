@@ -5,8 +5,11 @@ import Redis from "ioredis";
 import { v4 as uuidv4 } from "uuid";
 import { GoogleGenAI } from "@google/genai";
 import fs from 'fs';
+import natural from "natural";
+const stemmer = natural.PorterStemmerEs;
 const word_bank = JSON.parse(fs.readFileSync('./word_bank.json', 'utf-8'));
 
+const LAX_GAUGE = .85
 dotenv.config();
 const app = express();
 app.use(cors());
@@ -17,7 +20,7 @@ app.use(express.json());
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const ai = new GoogleGenAI({});
 
-app.get("/new-word", async (req, res) => {
+app.post("/new-word", async (req, res) => {
   try {
     // was using ai previously for word generation
     // const response = await ai.models.generateContent({
@@ -35,8 +38,8 @@ app.get("/new-word", async (req, res) => {
     // const raw = response.text;
     // const cleaned = raw.replace(/```json\n?/, "").replace(/```$/, "").trim();
     // const data = JSON.parse(cleaned);
-
-    const level = req.level || 'advanced';
+    const { difficulty } = req.body;
+    const level = difficulty || 'advanced';
     const gameId = uuidv4();
     const wordData = getRandomWord(level)
     const gameData = {
@@ -52,7 +55,7 @@ app.get("/new-word", async (req, res) => {
       return res.status(500).json({ error: err });
     }
 
-    return res.json({ english: wordData.english, synonyms: wordData.synonyms, gameId}); // hide Spanish answers
+    return res.json({ english: wordData.english, synonyms: [wordData.synonyms], gameId}); // hide Spanish answers
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch from Gemini" });
@@ -72,6 +75,15 @@ app.post("/guess", async (req, res) => {
     return res.status(404).json({ error: "Game not found or expired" });
   }
   const gameData = JSON.parse(gameRaw);
+
+  // const hint_array = currentHint.toLowerCase().split(" ");
+  // const synonyms = [...gameData.wordData.spanish, ...gameData.wordData.synonyms];
+
+  // if (validateHint(hint_array, synonyms)) {
+  //   return res.status(400).json({ error: "Your hint includes a word too close to the answer." });
+  // }
+  
+  
   const chathistory = constructHistory(gameData.hints, gameData.guesses)
   const chathistoryandcontext = [
     {
@@ -106,34 +118,58 @@ app.post("/guess", async (req, res) => {
       },
       history: chathistoryandcontext
     });
-
+    
     const response = await chat.sendMessage({
       message: currentHint,
     });
-
+    
     let guess = response.text;
-    const correct = gameData.wordData.spanish.some(
-      (w) => w.toLowerCase() === guess.toLowerCase()
-    );
-    if (!correct) {
-      gameData.hints.push(currentHint);
-      gameData.guesses.push(guess);
-      await redis.set(`game:${gameId}`, JSON.stringify(gameData), "EX", 3600);
+    
+    const embed_guess = await ai.models.embedContent({
+      model: 'gemini-embedding-001',
+      contents: [
+        `${guess}`
+      ],
+    });
+    
+    const embed_ans = await ai.models.embedContent({
+      model: 'gemini-embedding-001',
+      contents: [
+        `${gameData.wordData.spanish}`
+      ],
+    });
+    
+    const guess_vector = embed_guess.embeddings[0].values;
+    const ans_vector = embed_ans.embeddings[0].values;
+    
+    const similarity = cosineSimilarity(guess_vector, ans_vector);
+    console.log(similarity)
+    
+    const correct = similarity > LAX_GAUGE ? true : false
+    
+    // was using exact matching before, but switches to comparing vector embeddings to catch all similar words in meaning
+    // const correct = gameData.wordData.spanish.some(
+      //   (w) => w.toLowerCase() === guess.toLowerCase()
+      // );
+      if (!correct) {
+        gameData.hints.push(currentHint);
+        gameData.guesses.push(guess);
+        await redis.set(`game:${gameId}`, JSON.stringify(gameData), "EX", 3600);
+      }
+      
+      return res.json({ guess, correct });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to fetch from Gemini" });
     }
-
-    return res.json({ guess, correct });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch from Gemini" });
-  }
-});
-
-function constructHistory(hints, guesses) {
-  let history = []
-  for (let i = 0; i < hints.length; i++) {
-    history.push(
-      {
-        role: "user",
+  });
+  
+  function constructHistory(hints, guesses) {
+    let history = []
+    for (let i = 0; i < hints.length; i++) {
+      history.push(
+        {
+          role: "user",
         parts: [{ text: `${hints[i]}` }],
       },
       {
@@ -151,7 +187,20 @@ function getRandomWord(level = 'advanced') {
   return words[randomIndex];
 }
 
-console.log(Math.random());
+function cosineSimilarity(vecA, vecB) {
+  const dot = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+  const magA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+  const magB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+  return dot / (magA * magB);
+}
+
+function validateHint(hint, words) {
+  const hint_stems = hint.map(w => stemmer.stem(w));
+  console.log(hint_stems);
+  const word_stems = words.map(w => stemmer.stem(w));
+  console.log(word_stems);
+  return words.some(w => hint_stems.includes(w => word_stems));
+}
 
 // Start the server
 const PORT = process.env.PORT || 3000;
