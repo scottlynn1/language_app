@@ -61,7 +61,7 @@ aria-label={typeof labelRenderer === "function" ? undefined : `Progress: ${Math.
 className={`absolute left-0 top-0 bottom-0 rounded-full transition-[width] duration-500 ease-out ${animatedClass}`}
 style={{
 width: `${pct}%`,
-backgroundColor: "var(--progress-fill, #0ea5e9)", // falls back to Tailwind `sky-500` tone if using CSS variables
+backgroundColor: "var(--progress-fill, #5db2daff)",
 ...stripedStyle,
 }}
 />
@@ -79,7 +79,7 @@ labelRenderer(safeValue, Math.round(pct))
 </span>
 )}
 </div> */}
-<div className="text-xs opacity-70">{Math.round(pct)}%</div>
+<div className="text-lg opacity-70 text-slate-700">{Math.round(pct)}%</div>
 </div>
 )}
 </div>

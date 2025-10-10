@@ -55,7 +55,7 @@ app.post("/new-word", async (req, res) => {
       return res.status(500).json({ error: err });
     }
 
-    return res.json({ english: wordData.english, synonyms: [wordData.synonyms], gameId}); // hide Spanish answers
+    return res.json({ english: wordData.english, synonyms: wordData.synonyms, gameId}); // hide Spanish answers
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch from Gemini" });
