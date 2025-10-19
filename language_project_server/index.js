@@ -8,7 +8,7 @@ import fs from 'fs';
 import natural from "natural";
 const stemmer = natural.PorterStemmerEs;
 const word_bank = JSON.parse(fs.readFileSync('./word_bank.json', 'utf-8'));
-
+console.log(word_bank)
 const LAX_GAUGE = .85
 dotenv.config();
 const app = express();
@@ -20,26 +20,10 @@ app.use(express.json());
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const ai = new GoogleGenAI({});
 
-app.post("/new-word", async (req, res) => {
+app.post("/api/new-word", async (req, res) => {
   try {
-    // was using ai previously for word generation
-    // const response = await ai.models.generateContent({
-    //   model: "gemini-2.5-flash",
-    //   contents: `Generate one random but highschool level English noun or verb. 
-    //                    Provide exactly 3 of its Spanish translations (synonyms or equivalents).
-    //                    Return your answer just like this:
-    //                    { "english": "...", "spanish": ["...", "...", "..."] }`,
-    //   generationConfig: {
-    //     responseMimeType: "application/json",
-    //     responseSchema: '{ "english": "...", "spanish": ["...", "...", "..."] }'
-    //   }
-    // });
-
-    // const raw = response.text;
-    // const cleaned = raw.replace(/```json\n?/, "").replace(/```$/, "").trim();
-    // const data = JSON.parse(cleaned);
     const { difficulty } = req.body;
-    const level = difficulty || 'advanced';
+    const level = difficulty || 'beginner';
     const gameId = uuidv4();
     const wordData = getRandomWord(level)
     const gameData = {
@@ -63,7 +47,7 @@ app.post("/new-word", async (req, res) => {
 });
 
 // 2. Guess the Spanish word from hints
-app.post("/guess", async (req, res) => {
+app.post("/api/guess", async (req, res) => {
   const { currentHint, gameId } = req.body;
 
   if (!gameId) {
@@ -76,13 +60,23 @@ app.post("/guess", async (req, res) => {
   }
   const gameData = JSON.parse(gameRaw);
 
-  // const hint_array = currentHint.toLowerCase().split(" ");
-  // const synonyms = [...gameData.wordData.spanish, ...gameData.wordData.synonyms];
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: `You are a Spanish language morphological checker. Forbidden words: ${gameData.wordData.synonyms}. Target words: ${[...gameData.wordData.spanish, gameData.wordData.english]}. 
+    Given the text, respond only with "forbidden" if it includes any forbidden word or a morphological variant (plural, gendered, diminutive, augmentative, etc.).
+    Or else, respond only with "target" if it includes any similar word or a morphological variant (plural, gendered, diminutive, augmentative, etc.).
+    Otherwise respond "continue". 
+    Text: "${currentHint}"`,
+    generationConfig: {
+      responseMimeType: "text/plain",
+      // responseSchema: ''
+    }
+  });
 
-  // if (validateHint(hint_array, synonyms)) {
-  //   return res.status(400).json({ error: "Your hint includes a word too close to the answer." });
-  // }
-  
+  let guess = response.text.toLowerCase();
+  if (guess !== "continue") {
+    return res.json({ guess, correct: false });
+  }
   
   const chathistory = constructHistory(gameData.hints, gameData.guesses)
   const chathistoryandcontext = [
@@ -92,8 +86,9 @@ app.post("/guess", async (req, res) => {
         { text: 
           `You are playing a Spanish word guessing game. 
           Based on the hints provided by the user, respond with **exactly one correct Spanish translation or equivalent** for the English word. 
-          Some valid answers may be multiple words (like 'de sobra'). 
+          Leave out definite and indefinite articles in your guess. 
           Do NOT provide explanations, punctuation, or commentary. Only respond with the answer.
+          The answer will not be one of the words in the hints provided.
           The word in this round is going to be a ${gameData.wordData.partOfSpeech}`,
         }
       ]
@@ -123,7 +118,7 @@ app.post("/guess", async (req, res) => {
       message: currentHint,
     });
     
-    let guess = response.text;
+    guess = response.text;
     
     const embed_guess = await ai.models.embedContent({
       model: 'gemini-embedding-001',
@@ -131,26 +126,27 @@ app.post("/guess", async (req, res) => {
         `${guess}`
       ],
     });
-    
-    const embed_ans = await ai.models.embedContent({
-      model: 'gemini-embedding-001',
-      contents: [
-        `${gameData.wordData.spanish}`
-      ],
-    });
+    const embed_ans = gameData.wordData.spanish.map(async (word) => {
+      const res = await ai.models.embedContent({
+        model: 'gemini-embedding-001',
+          contents: [
+            word
+          ],
+      });
+      return res
+    })
+    const embed_ans_responses = await Promise.all(embed_ans);
     
     const guess_vector = embed_guess.embeddings[0].values;
-    const ans_vector = embed_ans.embeddings[0].values;
-    
-    const similarity = cosineSimilarity(guess_vector, ans_vector);
-    console.log(similarity)
-    
+    const ans_vectors = embed_ans_responses.map((embed) => embed.embeddings[0].values)
+    let similarity = 0
+    while (similarity <= LAX_GAUGE && ans_vectors.length) {
+      similarity = cosineSimilarity(guess_vector, ans_vectors[ans_vectors.length-1]);
+      ans_vectors.pop();
+    }    
     const correct = similarity > LAX_GAUGE ? true : false
     
-    // was using exact matching before, but switches to comparing vector embeddings to catch all similar words in meaning
-    // const correct = gameData.wordData.spanish.some(
-      //   (w) => w.toLowerCase() === guess.toLowerCase()
-      // );
+
       if (!correct) {
         gameData.hints.push(currentHint);
         gameData.guesses.push(guess);
@@ -181,7 +177,7 @@ app.post("/guess", async (req, res) => {
   return history;
 }
 
-function getRandomWord(level = 'advanced') {
+function getRandomWord(level = 'beginner') {
   const words = word_bank[level];
   const randomIndex = Math.floor(Math.random() * words.length);
   return words[randomIndex];
@@ -194,6 +190,7 @@ function cosineSimilarity(vecA, vecB) {
   return dot / (magA * magB);
 }
 
+// may use this to catch forbidden words in hints
 function validateHint(hint, words) {
   const hint_stems = hint.map(w => stemmer.stem(w));
   console.log(hint_stems);

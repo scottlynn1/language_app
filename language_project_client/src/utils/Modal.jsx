@@ -5,7 +5,7 @@ export default function Modal({ isOpen, onClose, children }) {
 
   return (
     <div className="fixed inset-0 flex items-start justify-center bg-black/70 backdrop-blue-md z-50">
-      <div className="bg-gray-300 mt-12 p-6 rounded-2xl shadow-lg max-w-148 w-full text-right">
+      <div className="bg-gray-300 mt-12 p-6 rounded-2xl shadow-lg max-w-43 sm:max-w-72 w-full text-right">
         {children}
         <button
           onClick={onClose}

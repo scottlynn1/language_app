@@ -1,230 +1,194 @@
 {
-  "beginner": [
-    {
-      "english": "apple",
-      "spanish": [
-        "manzana"
-      ],
-      "partOfSpeech": "noun",
-      "synonyms": [
-        "fruta",
-        "pomácea"
-      ]
-    },
-    {
-      "english": "dog",
-      "spanish": [
-        "perro"
-      ],
-      "partOfSpeech": "noun",
-      "synonyms": [
-        "can",
-        "mascota"
-      ]
-    },
-    {
-      "english": "run",
-      "spanish": [
-        "correr"
-      ],
-      "partOfSpeech": "verb",
-      "synonyms": [
-        "trotar",
-        "andar"
-      ]
-    },
-    {
-      "english": "book",
-      "spanish": [
-        "libro"
-      ],
-      "partOfSpeech": "noun",
-      "synonyms": [
-        "texto",
-        "volumen"
-      ]
-    },
-    {
-      "english": "water",
-      "spanish": [
-        "agua"
-      ],
-      "partOfSpeech": "noun",
-      "synonyms": [
-        "líquido",
-        "h2o"
-      ]
-    }
-  ],
-  "intermediate": [
-    {
-      "english": "dream",
-      "spanish": [
-        "sueño"
-      ],
-      "partOfSpeech": "noun",
-      "synonyms": [
-        "fantasía",
-        "ilusión"
-      ]
-    },
-    {
-      "english": "travel",
-      "spanish": [
-        "viajar"
-      ],
-      "partOfSpeech": "verb",
-      "synonyms": [
-        "desplazarse",
-        "recorrer"
-      ]
-    },
-    {
-      "english": "mirror",
-      "spanish": [
-        "espejo"
-      ],
-      "partOfSpeech": "noun",
-      "synonyms": [
-        "reflejo",
-        "vidrio"
-      ]
-    },
-    {
-      "english": "storm",
-      "spanish": [
-        "tormenta"
-      ],
-      "partOfSpeech": "noun",
-      "synonyms": [
-        "tempestad",
-        "lluvia"
-      ]
-    },
-    {
-      "english": "hope",
-      "spanish": [
-        "esperanza"
-      ],
-      "partOfSpeech": "noun",
-      "synonyms": [
-        "confianza",
-        "fe"
-      ]
-    }
-  ],
   "advanced": [
     {
-      "english": "freedom",
+      "english": "sail",
       "spanish": [
-        "libertad"
+        "zarpar",
+        "la vela"
       ],
-      "partOfSpeech": "noun",
+      "partOfSpeech": "noun or verb",
       "synonyms": [
-        "independencia",
-        "libre"
+        "barco",
+        "nave",
+        "bote",
+        "mar",
+        "viento"
       ]
     },
     {
-      "english": "justice",
+      "english": "crowd",
       "spanish": [
-        "justicia"
+        "multitud",
+        "muchedumbre"
       ],
       "partOfSpeech": "noun",
       "synonyms": [
-        "equidad",
-        "legalidad"
+        "gente",
+        "persona",
+        "mucha",
+        "monton",
+        "rebano"
       ]
     },
     {
-      "english": "courage",
+      "english": "hike",
       "spanish": [
-        "valentía"
+        "senderismo",
+        "excursion"
       ],
       "partOfSpeech": "noun",
       "synonyms": [
-        "bravura",
-        "audacia"
+        "caminar",
+        "pasear",
+        "montañas",
+        "mochila"
       ]
     },
     {
-      "english": "truth",
+      "english": "chew",
       "spanish": [
-        "verdad"
+        "masticar",
+        "mascar"
       ],
-      "partOfSpeech": "noun",
+      "partOfSpeech": "verb",
       "synonyms": [
-        "realidad",
-        "hecho"
+        "chicle",
+        "comida",
+        "comer",
+        "dientes"
       ]
     },
     {
-      "english": "faith",
+      "english": "spread",
       "spanish": [
-        "fe"
+        "distribuir",
+        "extender",
+        "desplegar",
+        "difundir",
+        "divulgar"
+      ],
+      "partOfSpeech": "verb",
+      "synonyms": [
+        "enfermedad",
+        "virus",
+        "infeccion",
+        "contagio"
+      ]
+    },
+    {
+      "english": "team",
+      "spanish": [
+        "equipo"
       ],
       "partOfSpeech": "noun",
       "synonyms": [
-        "creencia",
-        "confianza"
+        "deporte",
+        "groupo",
+        "jugar",
+        "junto"
+      ]
+    },
+    {
+      "english": "telepathy",
+      "spanish": [
+        "telepatia"
+      ],
+      "partOfSpeech": "noun",
+      "synonyms": [
+        "comunicar",
+        "pensamiento",
+        "mandar",
+        "miente"
       ]
     }
   ],
-  "expert": [
+  "beginner": [
     {
-      "english": "irony",
+      "english": "rainbow",
       "spanish": [
-        "ironía"
+        "arcoiris"
       ],
       "partOfSpeech": "noun",
       "synonyms": [
-        "sarcasmo",
-        "paradoja"
+        "colores",
+        "cielo"
       ]
     },
     {
-      "english": "nostalgia",
+      "english": "mermaid",
       "spanish": [
-        "nostalgia"
+        "sirena"
       ],
       "partOfSpeech": "noun",
       "synonyms": [
-        "melancolía",
-        "recuerdo"
+        "pez",
+        "cola"
       ]
     },
     {
-      "english": "intuition",
+      "english": "fireworks",
       "spanish": [
-        "intuición"
+        "los fuegos artificiales"
       ],
       "partOfSpeech": "noun",
       "synonyms": [
-        "presentimiento",
-        "corazonada"
+        "explosión",
+        "celebrar"
       ]
     },
     {
-      "english": "chaos",
+      "english": "wizard",
       "spanish": [
-        "caos"
+        "mago",
+        "hechicero",
+        "bruho"
       ],
       "partOfSpeech": "noun",
       "synonyms": [
-        "desorden",
-        "confusión"
+        "magico",
+        "hechizo"
       ]
     },
     {
-      "english": "serenity",
+      "english": "sour",
       "spanish": [
-        "serenidad"
+        "agrio",
+        "ácido",
+        "armargo"
+      ],
+      "partOfSpeech": "adjective",
+      "synonyms": [
+        "limón",
+        "probar",
+        "sabor"
+      ]
+    },
+    {
+      "english": "candle",
+      "spanish": [
+        "vela",
+        "candela"
       ],
       "partOfSpeech": "noun",
       "synonyms": [
-        "tranquilidad",
-        "calma"
+        "luz",
+        "llama"
+      ]
+    },
+    {
+      "english": "",
+      "spanish": [
+        "",
+        "",
+        ""
+      ],
+      "partOfSpeech": "",
+      "synonyms": [
+        "",
+        "",
+        ""
       ]
     }
   ]
 }
+
